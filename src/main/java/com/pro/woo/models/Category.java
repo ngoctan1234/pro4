@@ -1,7 +1,6 @@
 package com.pro.woo.models;
 import lombok.*;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
 
 @Data //tostring
 @Getter
@@ -11,4 +10,7 @@ import lombok.*;
 public class Category {
     @NotEmpty(message = "Category's name cannot be empty")
     private String name;
+
+    public static class UserLoginModel {
+    }
 }
