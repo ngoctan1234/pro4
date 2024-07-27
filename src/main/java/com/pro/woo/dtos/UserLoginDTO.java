@@ -1,4 +1,4 @@
-package com.pro.woo.models;
+package com.pro.woo.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLogin {
+public class UserLoginDTO {
     @NotBlank(message = "Phone number cannot be blank")
     @JsonProperty("phone_number")
     private String phoneNumber;

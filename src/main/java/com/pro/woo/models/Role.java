@@ -3,17 +3,18 @@ package com.pro.woo.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name="categories")
-@Data
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Data
+@Table(name="roles")
 @Builder
-public class Category {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
 }
