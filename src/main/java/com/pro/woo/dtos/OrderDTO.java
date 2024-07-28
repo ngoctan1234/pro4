@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @Getter
@@ -21,7 +23,7 @@ public class OrderDTO {
     private String fullName;
 
     private String email;
-    @JsonPropertyOrder("phone_number")
+    @JsonProperty("phone_number")
     @NotBlank(message = "Phone number must be at least 5 charaters")
     private String phoneNumber;
     private String address;
@@ -36,8 +38,23 @@ public class OrderDTO {
     @JsonProperty("shipping_address")
     private String shippingAddress;
 
+    @JsonProperty("shipping_date")
+    private LocalDate shippingDate;
     @JsonProperty("payment_method")
     private String paymentMethod;
 
 
 }
+//{
+//        "user_id":"1",
+//        "fullname":"Lê Văn Nai",
+//        "email":"naingongac@gmail.com",
+//        "phone_number":"123456",
+//        "address":"135 Hai Bà Trưng, HCM",
+//        "note":"Hàng dễ vỡ",
+//        "total_money":"150000",
+//        "shipping_method":"PENDDING",
+//        "payment_method":"cod"
+//
+//
+//        }

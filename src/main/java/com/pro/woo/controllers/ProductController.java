@@ -5,10 +5,15 @@ import com.pro.woo.dtos.ProductDTO;
 import com.pro.woo.dtos.ProductImageDTO;
 import com.pro.woo.models.Product;
 import com.pro.woo.models.ProductImage;
+import com.pro.woo.responses.ProductListResponse;
+import com.pro.woo.responses.ProductResponse;
 import com.pro.woo.services.IProductService;
 import com.pro.woo.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -119,7 +124,66 @@ public class ProductController {
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFiName;
    }
+   @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteById(@PathVariable("id") Long id){
+        try{
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().body("Delete successfull");
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+   }
+   @PutMapping("/{id}")
+    public ResponseEntity<?> updateById(@PathVariable("id") Long id,@RequestBody ProductDTO productDTO){
+        try{
+            productService.updateProduct(id,productDTO);
+            return ResponseEntity.ok().body("update successfull");
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+   }
+   @GetMapping("/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long id){
+        try{
+            Product existingProduct=productService.getProductById(id);
+            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+   }
+
+   @GetMapping("")
+    public ResponseEntity<ProductListResponse> getAllProduct(
+         @RequestParam("page") int page,
+         @RequestParam("limit") int limit
+   ){
+       PageRequest pageRequest=PageRequest.of(
+               page,limit,
+               Sort.by("createdAt").descending()
+       );
+
+       Page<ProductResponse> productPage=productService.getAllProducts(pageRequest);
+       int totalPages=productPage.getTotalPages();
+       List<ProductResponse> responseProducts=productPage.getContent();
+       return ResponseEntity.ok(ProductListResponse.builder()
+                       .responseProducts(responseProducts)
+                       .totalPages(totalPages)
+               .build());
+   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 //{
 //        "name":"Tai nghe 1",
 //        "price":20000,

@@ -9,6 +9,7 @@ import com.pro.woo.models.ProductImage;
 import com.pro.woo.repositories.CategoryRepository;
 import com.pro.woo.repositories.ProductImageRepository;
 import com.pro.woo.repositories.ProductRepository;
+import com.pro.woo.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,18 +45,35 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        return null;
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
+
+//        return productRepository.findAll(pageRequest)
+//                .map(ProductResponse::fromProduct);
+        return productRepository.findAll(pageRequest).map(product->{
+            return  ProductResponse.fromProduct(product);
+        });
     }
 
     @Override
     public Product updateProduct(Long id, ProductDTO productDTO) throws Exception {
+        Product existingProduct=getProductById(id);
+        if(existingProduct!=null){
+            Category existingCategory=
+                    categoryRepository.findById(id).
+                           orElseThrow(()-> new DataNotFoundException("Category not found"));
+            existingProduct.setName(productDTO.getName());
+            existingProduct.setPrice(productDTO.getPrice());
+            existingProduct.setThumbnail(productDTO.getThumbnail());
+            existingProduct.setDescription(productDTO.getDescription());
+            existingProduct.setCategory(existingCategory);
+            return productRepository.save(existingProduct);
+        }
         return null;
     }
 
     @Override
     public void deleteProduct(Long id) {
-
+        productRepository.deleteById(id);
     }
 
     @Override
