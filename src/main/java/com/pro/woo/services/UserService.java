@@ -3,10 +3,13 @@ package com.pro.woo.services;
 import com.pro.woo.components.JwtTokenUtil;
 import com.pro.woo.dtos.UserDTO;
 import com.pro.woo.exceptions.DataNotFoundException;
+import com.pro.woo.exceptions.ExpiredTokenException;
 import com.pro.woo.exceptions.PermissionDenyException;
 import com.pro.woo.models.Role;
+import com.pro.woo.models.Token;
 import com.pro.woo.models.User;
 import com.pro.woo.repositories.RoleRepository;
+import com.pro.woo.repositories.TokenRepository;
 import com.pro.woo.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final TokenRepository tokenRepository;
 
     @Override
     public User createUser(UserDTO userDTO) throws Exception {
@@ -57,6 +61,27 @@ public class UserService implements IUserService {
         }
         return userRepository.save(newUser);
     }
+    @Override
+    public User getUserDetailsFromToken(String token) throws Exception {
+        if(jwtTokenUtil.isTokenExpired(token)) {
+            throw new ExpiredTokenException("Token is expired");
+        }
+        String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+        Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
+
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new Exception("User not found");
+        }
+    }
+
+    @Override
+    public User getUserDetailsFromRefreshToken(String refreshToken) throws Exception {
+       Token existingToken = tokenRepository.findByRefreshToken(refreshToken);
+//       return getUserDetailsFromToken(existingToken.getToken());
+        return userRepository.findById(existingToken.getUser().getId()).get();
+    }
 
     @Override
     public String login(String phoneNumber, String password) throws  Exception{
@@ -74,6 +99,9 @@ public class UserService implements IUserService {
                 throw new BadCredentialsException("Wrong phone number or password");
             }
         }
+//        if(!existingUser.get().isActive()) {
+//            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.USER_IS_LOCKED));
+//        }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 phoneNumber, password,
                 existingUser.getAuthorities()
