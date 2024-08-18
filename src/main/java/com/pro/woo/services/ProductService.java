@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class ProductService implements IProductService {
         Product existingProduct=getProductById(id);
         if(existingProduct!=null){
             Category existingCategory=
-                    categoryRepository.findById(id).
+                    categoryRepository.findById(productDTO.getCategoryId()).
                            orElseThrow(()-> new DataNotFoundException("Category not found"));
             existingProduct.setName(productDTO.getName());
             existingProduct.setPrice(productDTO.getPrice());
@@ -79,6 +80,11 @@ public class ProductService implements IProductService {
     @Override
     public boolean existsByName(String name) {
         return false;
+    }
+
+    @Override
+    public List<ProductImage> getAllProductsImage(Long id) {
+        return productImageRepository.findByProductId(id);
     }
 
     @Override

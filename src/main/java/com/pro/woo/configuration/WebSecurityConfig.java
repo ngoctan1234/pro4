@@ -33,10 +33,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Arrays;
 
 import static org.springframework.http.HttpMethod.*;
+
+
+@EnableWebMvc
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -50,14 +54,14 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                //.csrf(AbstractHttpConfigurer::disable)
-                //.csrf().disable()
-//                .cors(Customizer.withDefaults())
-
+               .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable)
+                //.cors(Customizer.withDefaults())
+//                .and()
                 .authorizeRequests()
                 .requestMatchers(HttpMethod.POST, "api/users/login1").permitAll()
                 .requestMatchers(HttpMethod.POST, "api/users/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/users/login2").permitAll()
                 .requestMatchers(HttpMethod.POST, "api/categories").permitAll()
                 .requestMatchers(HttpMethod.GET, "swagger-ui/index.html").permitAll()
                 .requestMatchers(HttpMethod.POST,
@@ -89,9 +93,9 @@ public class WebSecurityConfig {
                 .requestMatchers(GET,
                         String.format("%s/order_details/**", apiPrefix)).permitAll()
 
-                .anyRequest().authenticated()
-                .and()
-                .csrf(AbstractHttpConfigurer::disable);
+                .anyRequest().authenticated();
+//                .and()
+//                .csrf(AbstractHttpConfigurer::disable);
 
         //http.securityMatcher(String.valueOf(EndpointRequest.toAnyEndpoint()));
         return http.build();

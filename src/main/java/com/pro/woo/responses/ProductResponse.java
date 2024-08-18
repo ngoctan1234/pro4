@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ProductResponse extends BaseResponse {
+    private Long id;
     private String name;
     private Float price;
     private String thumbnai;
@@ -19,6 +20,7 @@ public class ProductResponse extends BaseResponse {
     private Long categoryId;
     public static ProductResponse fromProduct(Product product) {
         ProductResponse responseProduct = ProductResponse.builder()
+                .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .price(product.getPrice())

@@ -3,7 +3,11 @@ package com.pro.woo.services;
 import com.pro.woo.dtos.CategoryDTO;
 import com.pro.woo.models.Category;
 import com.pro.woo.repositories.CategoryRepository;
+import com.pro.woo.responses.CategoryResponse;
+import com.pro.woo.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,9 +39,16 @@ public class CategoryService  implements ICategoryService{
         return existingCategory;
     }
 
+
+
     @Override
-    public List<Category> getAllCategories() {
-        return  categoryRepository.findAll();
+    public Page<CategoryResponse> getAllCategories(PageRequest pageRequest) {
+
+//        return productRepository.findAll(pageRequest)
+//                .map(ProductResponse::fromProduct);
+        return categoryRepository.findAll(pageRequest).map(category->{
+            return  CategoryResponse.fromCategory(category);
+        });
     }
 
     @Override

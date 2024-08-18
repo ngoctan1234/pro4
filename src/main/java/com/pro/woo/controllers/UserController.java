@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+
 public class UserController {
     private final IUserService userService;
     private final TokenService tokenService;
@@ -58,9 +59,15 @@ public class UserController {
             @Valid @RequestBody UserLoginDTO userLoginDTO){
         return ResponseEntity.ok("login 1 success");
     }
+
+    @PostMapping("/login2")
+    public ResponseEntity<String> login2(){
+        return ResponseEntity.ok("login 2 success");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody UserLoginDTO userLoginDTO
+             @Valid @RequestBody UserLoginDTO userLoginDTO
     ) {
         try{
             String token = userService.login(userLoginDTO.getPhoneNumber(),

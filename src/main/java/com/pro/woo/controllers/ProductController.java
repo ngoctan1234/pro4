@@ -11,6 +11,7 @@ import com.pro.woo.services.IProductService;
 import com.pro.woo.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -170,6 +171,38 @@ public class ProductController {
                        .totalPages(totalPages)
                .build());
    }
+
+    @GetMapping("/productDetail/{id}")
+    public ResponseEntity<?> getProductDetail(@PathVariable("id") Long id){
+        try{
+            return ResponseEntity.ok(productService.getAllProductsImage(id));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("upload/"+imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+               // logger.info(imageName + " not found");
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.jpeg").toUri()));
+                //return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            //logger.error("Error occurred while retrieving image: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
 
 
