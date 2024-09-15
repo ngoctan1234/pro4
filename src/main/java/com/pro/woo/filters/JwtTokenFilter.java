@@ -31,8 +31,9 @@ import org.springframework.web.filter.*;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-//    @Value("${api.prefix}")
-    private final String apiPrefix="api";
+
+   // @Value("${api.prefix}")
+    private final String apiPrefix="/api";
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
     @Override
@@ -86,12 +87,24 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/users/refresh-token", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/login", apiPrefix), "POST")
         );
+        // Lấy đường dẫn servlet và phương thức từ yêu cầu
+        String servletPath = request.getServletPath();
+        String method = request.getMethod();
+
+        // In ra thông tin debug
+        System.out.println("Request Path: " + servletPath);
+        System.out.println("Request Method: " + method);
         for(Pair<String, String> bypassToken: bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
+            String pattern = bypassToken.getFirst();
+            if (matchPattern(servletPath, pattern) && method.equals(bypassToken.getSecond())) {
                 return true;
             }
         }
         return false;
+    }
+    private boolean matchPattern(String path, String pattern) {
+        // Thay đổi dấu ** trong pattern thành regex để so sánh
+        String regexPattern = pattern.replace("**", ".*");
+        return path.matches(regexPattern);
     }
 }
